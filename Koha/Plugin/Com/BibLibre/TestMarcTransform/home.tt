@@ -1,0 +1,285 @@
+[% USE CGI %]
+[% INCLUDE 'doc-head-open.inc' %]
+ <title>Koha: Test MARC::Transform</title>
+[% INCLUDE 'doc-head-close.inc' %]
+<script type="text/javascript" src="/plugin/Koha/Plugin/Com/BibLibre/TestMarcTransform/jsdiff.js"></script>
+<script type="text/javascript">
+$(function() {
+  $('#savetextarea').click(function(e) {
+    var data = document.getElementById('yamlcode').value;
+    var data = 'data:application/x-yaml;charset=utf-8,' + encodeURIComponent(data);
+    var el = e.currentTarget;
+    el.href = data;
+    el.target = '_blank';
+    el.download = 'TestMarcTransform.yaml';
+  });
+});
+</script>
+<style type="text/css">
+    ins { background-color: #e6ffe6; }
+    del { background-color: #ffe6e6; }
+    .diffcol1 ins, .diffcol2 del { display:none; }
+    pre { padding: 10px; overflow: scroll; }
+    .diffcol1 { float: left; width: 49.1%; display: inline; margin: 0; padding: 0; }
+    .diffcol2 { float: right; width: 49.1%; display: inline; margin: 0; padding: 0; }
+    .mtt-red { color: red; }
+    .mtt-bgf4f8f9 { background-color: #f4f8f9; }
+    .mtt-fw700 { font-weight: 700; }
+    .mtt-note { font-style: italic; font-weight: normal; font-size: 0.9em; }
+    .mtt-note a { font-weight: bold }
+    .mtt-bord0bgtr { border: 0px solid transparent !important; background-color:transparent !important; }
+    .mtt-gray { color: #646464; }
+    #mtt-tableresult { width:100%; border-bottom: 2px solid #b9d8d9; table-layout: fixed; }
+    #mtt-tableresult td { background-color: transparent; }
+    #mtt-tableresult h4 { display: inline; }
+    .mtt-trresulta { border-top: 2px solid #b9d8d9; border-right: 2px solid #b9d8d9; border-left: 2px solid #b9d8d9; }
+    .mtt-trresulta td { background-color: #e6f0f2 !important; }
+    .mtt-trresultb { border-bottom: 2px solid #b9d8d9; border-right: 2px solid #b9d8d9; border-left: 2px solid #b9d8d9; }
+    #pyamlcode { padding: 5px; border: 1px solid #b9d8d9; }
+    #pyamlfile { display: none; }
+    .mtt-btna { background: none !important; border-style: solid !important; border-color: #adadad #adadad #949494 !important; font-family: arial, sans-serif !important; color: #337ab7 !important; cursor: pointer; padding: .5em !important }
+    .mtt-btna:hover, .mtt-btna:focus { color: #333 !important; }
+    #recordids { vertical-align: top; }
+    #formnumtd, #formyamltd { padding-right: 30px; }
+    #mttform1 label { display: inline; }
+    #saveserverfilespan { display: inline-block; position: relative; top: 7px; left: 7px; }
+</style>
+</head>
+<body>
+[% INCLUDE 'header.inc' %]
+[% INCLUDE 'cat-search.inc' %]
+
+<div id="breadcrumbs"><a href="/cgi-bin/koha/mainpage.pl">Home</a> &rsaquo; <a href="/cgi-bin/koha/plugins/plugins-home.pl">Plugins</a> &rsaquo; Test MARC::Transform</div>
+
+<div class="main container-fluid">
+    <div class="row">
+    <div class="col-sm-10">
+    <h2>Koha plugin "Test MARC::Transform"</h2>
+    [% IF module_unavailable %]
+        <h3 class="mtt-red">Error: </h3>
+        <p class="mtt-red mtt-bgf4f8f9">MARC::Transform is not installed<br /><a href="/cgi-bin/koha/plugins/run.pl?class=Koha::Plugin::Com::BibLibre::TestMarcTransform&method=tool" class="mtt-fw700">RELOAD</a></p>
+    [% ELSE %]
+        [% IF error %]
+            <h3 class="mtt-red">Error: </h3>
+            <p  class="mtt-red mtt-bgf4f8f9">
+            [% error %]<br /><a href="/cgi-bin/koha/plugins/run.pl?class=Koha::Plugin::Com::BibLibre::TestMarcTransform&method=tool" class="mtt-fw700">RELOAD</a>
+            </p>
+        [% ELSE %]
+            <p>
+            This plugin aims to test MARC::Transform's yaml's configuration on Koha MARC records (biblios or authorities)
+            </p>
+            <p class="mtt-note mtt-gray">Note that:
+            <br />&nbsp;&nbsp;- this plugin displays what the transformed records would give but transformed records are not saved
+            <br />&nbsp;&nbsp;- you can find help to write the MARC::Transform's yaml configuration <a href="https://metacpan.org/pod/MARC::Transform" target="_blank">here</a>
+            </p>
+            [% UNLESS runned %]
+                [% IF module_version %]
+                    [% IF module_version == '0.003006' %]
+                        <div class="dialog message">
+                        Installed version of MARC::Transform is [% module_version %] but latest version is 0.003008, so you might encounter malfunctions:<br />- with comments if you use a recent version of the yaml module (fixed in 0.003007)<br />- with fields 010 that can be considered as control fields if they are used in the yaml (fixed in 0.003008)
+                        </div>
+                    [% ELSIF module_version == '0.003007' %]
+                        <div class="dialog message">
+                        Installed version of MARC::Transform is [% module_version %] but latest version is 0.003008, so you might encounter malfunctions with fields 010 that can be considered as control fields if they are used in the yaml (fixed in 0.003008)
+                        </div>
+                    [% ELSIF module_version == '0.003008' %]
+                    [% ELSE %]
+                        <div class="dialog message">
+                        Installed version of MARC::Transform is [% module_version %] but latest version is 0.003008, so you might encounter malfunctions
+                        </div>
+                    [% END %]
+                [% END %]
+            [% END %]
+            <div class="form-group">
+                <form method="post" enctype="multipart/form-data" id="testmarctransformform">
+                    <fieldset class="brief">
+                    <table  id="mttform1" class="mtt-bord0bgtr">
+                    <tr>
+                    <td id="formnumtd" class="mtt-bord0bgtr">
+                    <label for="authorbib">biblionumber(s) or authid(s): </label><br /><span class="mtt-note mtt-gray">(one id per line or separated by spaces)</span><br />
+                    <select name="authorbib">
+                        <option value="biblionumber" [% IF CGI.param('authorbib') == 'biblionumber' %]selected[% END %]>biblionumber(s)</option>
+                        <option value="authid" [% IF CGI.param('authorbib') == 'authid' %]selected[% END %]>authid(s)</option>
+                    </select>
+                    <textarea rows="2" cols="7" name="recordids" id="recordids" form="testmarctransformform" required>[% IF CGI.param('recordids') %][% CGI.param('recordids') %][% END %]</textarea>
+                    </td>
+                    <td  id="formyamltd" class="mtt-bord0bgtr">
+                    <label for="yamldiv">MARC::Transform's yaml configuration: </label>
+                    <br />
+                    <div name="yamldiv" id="yamldiv">
+                        <script type="text/javascript">
+                          $(document).ready(function(){
+                            $("#selectyamlfile").click(function(){
+                              $("#pyamlfile").show(500);
+                              $("#pyamlcode").hide(500);
+                              $("#yamlcode").hide(500);
+                              $("#savetextarea").hide(500);
+                              $("#savebuttons").hide(500);
+                              $("#pyamlpath").hide(500);
+                              $('#yamlfile').prop('required', true);
+                              $('#yamlpath').prop('required', false);
+                            });
+                            $("#selectyamlcode").click(function(){
+                              $("#pyamlfile").hide(500);
+                              $("#pyamlcode").show(500);
+                              $("#yamlcode").show(500);
+                              $("#savetextarea").show(500);
+                              $("#savebuttons").show(500);
+                              $("#pyamlpath").hide(500);
+                              $('#yamlfile').prop('required', false);
+                              $('#yamlpath').prop('required', false);
+                            });
+                            $("#selectyamlpath").click(function(){
+                              $("#pyamlfile").hide(500);
+                              $("#pyamlcode").hide(500);
+                              $("#yamlcode").hide(500);
+                              $("#savetextarea").hide(500);
+                              $("#savebuttons").hide(500);
+                              $("#pyamlpath").show(500);
+                              $('#yamlfile').prop('required', false);
+                              $('#yamlpath').prop('required', true);
+                            });
+                            
+                          });
+                        </script>
+                        <input type="radio" name="yamluptype" value="yamlfile" id="selectyamlfile" required> select a local file<br />
+                        <input type="radio" name="yamluptype" value="yamlcode" id="selectyamlcode"[% IF yamlrun %][% UNLESS yamlpath %] checked[% END %][% END %] required> edit code<br />
+                        <input type="radio" name="yamluptype" value="yamlpath" id="selectyamlpath" [% IF yamlpath %] checked[% END %] required> set server's yaml path<br />
+                    </div>
+                    </td>
+                    <td class="mtt-bord0bgtr"><label class="mtt-gray" for="mthcontent">define optional $mth content</label>
+                    <span class="mtt-note mtt-gray"> passed as parameter to<br />MARC::Transform. For experienced developers, define $mth<br />content using perl (like: $mth{'foo'}='var') as explained <a href="https://metacpan.org/pod/MARC::Transform#$mth" target="_blank">here</a></span><br />
+                    <textarea rows="1" cols="20" name="mthcontent" id="mthcontent" form="testmarctransformform">[% IF CGI.param('mthcontent') %][% CGI.param('mthcontent') %][% END %]</textarea>
+                    </td>
+                    </tr>
+                    </table>
+                    <p id="pyamlfile">
+                        <label for="yamlfile">choose a local file: </label>
+                        <input type="file" name="yamlfile" id="yamlfile" accept=".yaml,.yml">
+                    </p>
+                    <div id="pyamlcode" [% IF yamlrun %][% IF yamlpath %]style="display:none;"[% END %][% ELSE %]style="display:none;"[% END %]>
+                        <label for="yamlcode" class="mtt-fw700">write YAML here <span class="mtt-note mtt-gray">(caution: this text will not be saved in the original file unless you click on [% IF filepathtosave %]one of the 2 buttons[% ELSE %]the button[% END %] «Save...»  below)</span>: </label>
+                        <p>
+                            <textarea rows="10" cols="100" name="yamlcode" id="yamlcode" form="testmarctransformform" [% IF yamlrun %][% UNLESS yamlpath %][% ELSE %]style="display:none;"[% END %][% ELSE %]style="display:none;"[% END %]>[% IF yamlrun %][% yamlrun %][% END %]</textarea>
+                        </p>
+                        <p>
+                            <a id="savetextarea" class="btn">Save to a local file</a>
+                            [% IF filepathtosave %]
+                            <span id="savebuttons" [% IF yamlrun %][% IF yamlpath %]style="display:none;"[% END %][% ELSE %]style="display:none;"[% END %]>
+                            <input type="hidden" name="filepathtosave" value="[% filepathtosave %]">
+                            or <input class="btn mtt-btna" name="saveserverfile" id="saveserverfile" type="submit" value="Save server's file «[% filepathtosave %]»"/><span id="saveserverfilespan" class="mtt-note mtt-gray">(caution: if you don't have write permission to this file you'll<br /> encounter an error and code modifications will be lost)</span></span>
+                            [% END %]
+                        </p>
+                    </div>
+                    <p id="pyamlpath" [% UNLESS yamlpath %]style="display:none;"[% END %]>
+                        <label for="yamlpath">set server's yaml path: </label>
+                        <input type="text" name="yamlpath" id="yamlpath"[% IF yamlpath %] value="[% yamlpath %]"[% END %]>
+                        <span class="mtt-note mtt-gray">[% IF yamlrun && yamlpath %]you can directly edit the code by checking «edit code» above[% ELSE %]caution: if you don't have read permission to this file or if it does not exist you'll encounter an error[% END %]</span>
+                    </p>
+                    <p>
+                        <input type="hidden" name="class" value="[% CLASS %]">
+                        <input type="hidden" name="method" value="[% METHOD %]">
+                        <input name="run" type="submit" value="RUN" class="mtt-fw700" />
+                    </p>
+                    </fieldset>
+                </form>
+            </div>
+            [% IF runned %]
+            [% IF jobs && jobs.size > 0 %]
+            <h3>Result</h3>
+            <table id="mtt-tableresult">
+            [% FOREACH job IN jobs %]
+                <tr class="mtt-trresulta">
+                <td>
+                    <script type="text/javascript">
+                      $(document).ready(function(){
+                        $("#[% job.increc %]togglerecordreturn").click(function(){
+                          $("#record[% job.increc %]").toggle(500);
+                          if($("#[% job.increc %]togglerecordreturn").text()=="Hide result"){
+                              $("#[% job.increc %]togglerecordreturn").text('Show result');
+                          } else {
+                              $("#[% job.increc %]togglerecordreturn").text('Hide result');
+                          }
+                        });
+                      });
+                    </script>
+                    <h4 for="[% job.increc %]togglerecordreturn">Record [% IF job.title %][% job.title %][% END %]: </h4>
+                    <button id="[% job.increc %]togglerecordreturn">[% UNLESS job.increc == '1' || job.error %]Show result[% ELSE %]Hide result[% END %]</button>
+                </td>
+                </tr>
+                <tr id="record[% job.increc %]" class="mtt-trresultb" [% UNLESS job.increc == '1' || job.error %]style="display:none;"[% END %]>
+                <td>
+                [% IF job.error %]
+                    <h3 class="mtt-red">Error: </h3>
+                    <p class="mtt-red mtt-bgf4f8f9">
+                    [% job.error %]
+                    </p>
+                [% ELSE %]
+                    [% IF job.recordbefore && job.recordafter %]
+                        <script type="text/javascript">
+                            $(document).ready(function(){
+                              var diff1t[% job.increc %] = $("#[% job.increc %]col1 pre").text();
+                              var diff2t[% job.increc %] = $("#[% job.increc %]col2 pre").text();
+                              var diffst[% job.increc %] = diffString(diff1t[% job.increc %],diff2t[% job.increc %]);
+                              $("#[% job.increc %]col1 pre,#[% job.increc %]col2 pre").html(diffst[% job.increc %]);
+                            });
+                        </script>
+                        [% IF job.mthreturn %]
+                            <script type="text/javascript">
+                              $(document).ready(function(){
+                                $("#[% job.increc %]togglemthreturn").click(function(){
+                                  $("#[% job.increc %]mthreturn").toggle(500);
+                                  if($("#[% job.increc %]togglemthreturn").text()=="hide $mth"){
+                                      $("#[% job.increc %]togglemthreturn").text('show $mth');
+                                  } else {
+                                      $("#[% job.increc %]togglemthreturn").text('hide $mth');
+                                  }
+                                });
+                              });
+                            </script>
+                            <p>
+                                <label for="[% job.increc %]mthreturn" class="mtt-fw700">$mth content after: </label>
+                                <button id="[% job.increc %]togglemthreturn">hide $mth</button>
+                                <pre id="[% job.increc %]mthreturn" class="mtt-bgf4f8f9" style="overflow:visible;">[% job.mthreturn %]</pre>
+                            </p>
+                        [% END %]
+                        [% IF job.recordbefore %]
+                            <div class="diffcol1" id="[% job.increc %]col1">
+                            <label for="[% job.increc %]recordbefore"class="mtt-fw700">Record before transformation: </label>
+                            <pre id="[% job.increc %]recordbefore" class="mtt-bgf4f8f9">[% job.recordbefore %]</pre>
+                            </div>
+                        [% ELSE %]
+                            <div class="diffcol1">
+                            <label for="[% job.increc %]recordafter" class="mtt-fw700">a problem was encountered with Record before transformation: </label>
+                            </div>
+                        [% END %]
+                        [% IF job.recordafter %]
+                            <div class="diffcol2" id="[% job.increc %]col2">
+                            <label for="[% job.increc %]recordafter" class="mtt-fw700">Record after transformation: </label>
+                            <pre id="[% job.increc %]recordafter" class="mtt-bgf4f8f9">[% job.recordafter %]</pre>
+                            </div>
+                        [% ELSE %]
+                            <div class="diffcol2">
+                            <label for="[% job.increc %]recordafter" class="mtt-fw700">a problem was encountered with Record after transformation: </label>
+                            </div>
+                        [% END %]
+                    [% END %]
+                [% END %]
+                </td>
+                </tr>
+            [% END %]
+            </table>
+            [% ELSE %]
+                <h3 class="mtt-red">Error: </h3>
+                <p class="mtt-red mtt-bgf4f8f9">
+                a problem was encountered<br /><a href="/cgi-bin/koha/plugins/run.pl?class=Koha::Plugin::Com::BibLibre::TestMarcTransform&method=tool" class="mtt-fw700">RELOAD</a>
+                </p>
+            [% END %]
+            [% END %]
+        [% END %]
+    [% END %]
+    </div>
+    </div>
+</div>
+
+[% INCLUDE 'intranet-bottom.inc' %]
