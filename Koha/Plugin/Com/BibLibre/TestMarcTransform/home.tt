@@ -43,6 +43,7 @@ $(function() {
     #formnumtd, #formyamltd { padding-right: 30px; }
     #mttform1 label { display: inline; }
     #saveserverfilespan { display: inline-block; position: relative; top: 7px; left: 7px; }
+    #yamldiv { padding-top: 15px; }
 </style>
 </head>
 <body>
@@ -115,9 +116,7 @@ $(function() {
                               $("#yamlcode").hide(500);
                               $("#savetextarea").hide(500);
                               $("#savebuttons").hide(500);
-                              $("#pyamlpath").hide(500);
                               $('#yamlfile').prop('required', true);
-                              $('#yamlpath').prop('required', false);
                             });
                             $("#selectyamlcode").click(function(){
                               $("#pyamlfile").hide(500);
@@ -125,26 +124,12 @@ $(function() {
                               $("#yamlcode").show(500);
                               $("#savetextarea").show(500);
                               $("#savebuttons").show(500);
-                              $("#pyamlpath").hide(500);
                               $('#yamlfile').prop('required', false);
-                              $('#yamlpath').prop('required', false);
                             });
-                            $("#selectyamlpath").click(function(){
-                              $("#pyamlfile").hide(500);
-                              $("#pyamlcode").hide(500);
-                              $("#yamlcode").hide(500);
-                              $("#savetextarea").hide(500);
-                              $("#savebuttons").hide(500);
-                              $("#pyamlpath").show(500);
-                              $('#yamlfile').prop('required', false);
-                              $('#yamlpath').prop('required', true);
-                            });
-                            
                           });
                         </script>
                         <input type="radio" name="yamluptype" value="yamlfile" id="selectyamlfile" required> select a local file<br />
-                        <input type="radio" name="yamluptype" value="yamlcode" id="selectyamlcode"[% IF yamlrun %][% UNLESS yamlpath %] checked[% END %][% END %] required> edit code<br />
-                        <input type="radio" name="yamluptype" value="yamlpath" id="selectyamlpath" [% IF yamlpath %] checked[% END %] required> set server's yaml path<br />
+                        <input type="radio" name="yamluptype" value="yamlcode" id="selectyamlcode"[% IF yamlrun %] checked[% END %] required> edit code<br />
                     </div>
                     </td>
                     <td class="mtt-bord0bgtr"><label class="mtt-gray" for="mthcontent">define optional $mth content</label>
@@ -157,25 +142,15 @@ $(function() {
                         <label for="yamlfile">choose a local file: </label>
                         <input type="file" name="yamlfile" id="yamlfile" accept=".yaml,.yml">
                     </p>
-                    <div id="pyamlcode" [% IF yamlrun %][% IF yamlpath %]style="display:none;"[% END %][% ELSE %]style="display:none;"[% END %]>
-                        <label for="yamlcode" class="mtt-fw700">write YAML here <span class="mtt-note mtt-gray">(caution: this text will not be saved in the original file unless you click on [% IF filepathtosave %]one of the 2 buttons[% ELSE %]the button[% END %] «Save...»  below)</span>: </label>
+                    <div id="pyamlcode" [% IF yamlrun %][% ELSE %]style="display:none;"[% END %]>
+                        <label for="yamlcode" class="mtt-fw700">write YAML here <span class="mtt-note mtt-gray">(caution: this text will not be saved in the original file unless you click on the button «Save...»  below)</span>: </label>
                         <p>
-                            <textarea rows="10" cols="100" name="yamlcode" id="yamlcode" form="testmarctransformform" [% IF yamlrun %][% UNLESS yamlpath %][% ELSE %]style="display:none;"[% END %][% ELSE %]style="display:none;"[% END %]>[% IF yamlrun %][% yamlrun %][% END %]</textarea>
+                            <textarea rows="10" cols="100" name="yamlcode" id="yamlcode" form="testmarctransformform" [% IF yamlrun %][% ELSE %]style="display:none;"[% END %]>[% IF yamlrun %][% yamlrun %][% END %]</textarea>
                         </p>
                         <p>
                             <a id="savetextarea" class="btn">Save to a local file</a>
-                            [% IF filepathtosave %]
-                            <span id="savebuttons" [% IF yamlrun %][% IF yamlpath %]style="display:none;"[% END %][% ELSE %]style="display:none;"[% END %]>
-                            <input type="hidden" name="filepathtosave" value="[% filepathtosave %]">
-                            or <input class="btn mtt-btna" name="saveserverfile" id="saveserverfile" type="submit" value="Save server's file «[% filepathtosave %]»"/><span id="saveserverfilespan" class="mtt-note mtt-gray">(caution: if you don't have write permission to this file you'll<br /> encounter an error and code modifications will be lost)</span></span>
-                            [% END %]
                         </p>
                     </div>
-                    <p id="pyamlpath" [% UNLESS yamlpath %]style="display:none;"[% END %]>
-                        <label for="yamlpath">set server's yaml path: </label>
-                        <input type="text" name="yamlpath" id="yamlpath"[% IF yamlpath %] value="[% yamlpath %]"[% END %]>
-                        <span class="mtt-note mtt-gray">[% IF yamlrun && yamlpath %]you can directly edit the code by checking «edit code» above[% ELSE %]caution: if you don't have read permission to this file or if it does not exist you'll encounter an error[% END %]</span>
-                    </p>
                     <p>
                         <input type="hidden" name="class" value="[% CLASS %]">
                         <input type="hidden" name="method" value="[% METHOD %]">

@@ -2,7 +2,7 @@
 
 This plugin aims to test MARC::Transform's yaml's configuration on Koha MARC records (biblios or authorities).
 
-Yaml configuration can be edited in the plugin page or be loaded from a local or server's file (its content is then editable online).
+Yaml configuration can be edited in the plugin page or be loaded from a local file (its content is then editable online).
 
 This plugin displays what the transformed records would give but transformed records are not saved.
 

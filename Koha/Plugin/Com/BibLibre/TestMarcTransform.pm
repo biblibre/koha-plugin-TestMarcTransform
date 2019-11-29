@@ -17,7 +17,6 @@ use open qw/ :std :utf8 /;
 use Koha::Biblios;
 my $module_unavailable = 0;
 eval "use MARC::Transform; 1" or $module_unavailable = 1;
-our $VERSION = "0.1.0";
 my $module_version;
 unless($module_unavailable){
     $module_version="$MARC::Transform::VERSION";
@@ -27,10 +26,10 @@ our $metadata = {
     name            => 'Test MARC::Transform',
     author          => 'Stéphane Delaune <stephane.delaune@biblibre.com>',
     date_authored   => '2019-11-22',
-    date_updated    => '2019-11-22',
+    date_updated    => '2019-11-29',
     minimum_version => '17.11.00.000',
     maximum_version => undef,
-    version         => $VERSION,
+    version         => "0.1.1",
     description     => "This plugin aims to test MARC::Transform's yaml's configuration on Koha MARC records (biblios or authorities)",
 };
 #mandatory
@@ -71,21 +70,6 @@ sub run {
         eval($cgi->param('mthcontent'));
         $template->param('mthcontent' => $cgi->param('mthcontent'));
     }
-    #set file path on server if defined
-    my $filepathtosave;
-    if(defnonull($cgi->param('filepathtosave'))){
-        $filepathtosave = $cgi->param('filepathtosave');
-        $template->param('filepathtosave' => $filepathtosave);
-    }
-    #save file on server if defined
-    if ($cgi->param('saveserverfile') and defnonull($filepathtosave) and $cgi->param('yamlcode')){
-        eval { writeOutputFile($filepathtosave,$cgi->param('yamlcode'))};
-        if ($@) {$@=~s/\n/<br \/>/g;$error.= "error on saving file ". $@.". ";}
-    }
-    if(defnonull($error)){
-        $template->param('error' => $error);
-        return $self->output_html( $template->output() );
-    }
     #set yaml content :
     #if local yaml file was loaded
     if ($cgi->param('yamluptype') and $cgi->param('yamluptype') eq "yamlfile"){
@@ -97,19 +81,6 @@ sub run {
     }#else if yaml code was directly writted
     elsif($cgi->param('yamluptype') and $cgi->param('yamluptype') eq "yamlcode" and $cgi->param('yamlcode')){
         $yaml=$cgi->param('yamlcode');
-    }#else if file path on server was defined
-    elsif($cgi->param('yamluptype') and $cgi->param('yamluptype') eq "yamlpath" and defnonull($cgi->param('yamlpath'))){
-        my $filepath = $cgi->param('yamlpath');
-        my $linefhp;
-        if (open(my $fhp, '<:encoding(UTF-8)', $filepath)) {
-            while ($linefhp = <$fhp>) {
-                $yaml.=$linefhp;
-            }
-            $template->param('yamlpath' => $filepath);
-            $template->param('filepathtosave' => $filepath);
-        } else {
-            $error.= "Could not open file '$filepath' $! . ";
-        }
     }
     $template->param('yamlrun' => $yaml) if defnonull($yaml);
     if(defnonull($error)){
@@ -197,17 +168,6 @@ sub deldefaultlut{
     $str=~s/\n\s+};//;
     $str=~s/\n          /\n/g;
     return $str;
-}
-
-sub writeOutputFile 
-{
-    my $filepath = shift;
-    my $content = shift;
-    my $fout;
-    open ($fout, "> $filepath") || die ("Error: Could not open output file $filepath ");
-    print $fout "$content";
-    #my @contents = split '\n', $content;my $line;foreach $line (@contents){chomp($line);next if ( $line =~ /^\s*$/m );print $fout "$line\n";}
-    close ($fout);
 }
 
 sub defnonull { my $var = shift; defined $var and $var ne "" }
