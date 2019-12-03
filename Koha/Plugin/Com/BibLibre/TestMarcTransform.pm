@@ -26,10 +26,10 @@ our $metadata = {
     name            => 'Test MARC::Transform',
     author          => 'Stéphane Delaune <stephane.delaune@biblibre.com>',
     date_authored   => '2019-11-22',
-    date_updated    => '2019-11-29',
+    date_updated    => '2019-12-03',
     minimum_version => '17.11.00.000',
     maximum_version => undef,
-    version         => "0.1.1",
+    version         => "0.1.2",
     description     => "This plugin aims to test MARC::Transform's yaml's configuration on Koha MARC records (biblios or authorities)",
 };
 #mandatory
@@ -105,6 +105,7 @@ sub run {
                 if($cgi->param('authorbib') eq "biblionumber"){
                     eval { $record = GetMarcBiblio({ biblionumber => $recordid, embed_items  => 1 })};
                     if ($@) {$@=~s/\n/<br \/>/g;$terror.= $recordid." is a bad biblionumber from GetMarcBiblio:". $@.". ";}
+                    elsif (!$record) {$terror.= $recordid." is a bad biblionumber from GetMarcBiblio.";}
                     else {
                         my $biblio = Koha::Biblios->find( $recordid );
                         $title = "Biblio number ".$recordid." «".$biblio->title."»";
@@ -117,7 +118,10 @@ sub run {
                         $title = "Authority number ".$recordid;
                     }
                 }
-                next if(defnonull($terror));
+                if(defnonull($terror)){
+                    push (@jobs, {'error' => $terror, 'increc' => $increc});
+                    next;
+                }
                 #write record content before transformation
                 $recordbefore=$record->as_formatted;
                 $recordbefore=~s/^LDR /_LDR «/g;
