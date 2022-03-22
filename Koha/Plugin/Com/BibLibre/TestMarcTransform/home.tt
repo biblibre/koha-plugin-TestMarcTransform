@@ -79,16 +79,20 @@ $(function() {
                 [% IF module_version %]
                     [% IF module_version == '0.003006' %]
                         <div class="dialog message">
-                        Installed version of MARC::Transform is [% module_version %] but latest version is 0.003008, so you might encounter malfunctions:<br />- with comments if you use a recent version of the yaml module (fixed in 0.003007)<br />- with fields 010 that can be considered as control fields if they are used in the yaml (fixed in 0.003008)
+                        Installed version of MARC::Transform is [% module_version %] but latest version is 0.003009, so you might encounter malfunctions:<br />- with comments if you use a recent version of the yaml module (fixed in 0.003007)<br />- with fields 010 that can be considered as control fields if they are used in the yaml (fixed in 0.003009)
                         </div>
                     [% ELSIF module_version == '0.003007' %]
                         <div class="dialog message">
-                        Installed version of MARC::Transform is [% module_version %] but latest version is 0.003008, so you might encounter malfunctions with fields 010 that can be considered as control fields if they are used in the yaml (fixed in 0.003008)
+                        Installed version of MARC::Transform is [% module_version %] but latest version is 0.003009, so you might encounter malfunctions with fields 010 that can be considered as control fields if they are used in the yaml (fixed in 0.003009)
                         </div>
                     [% ELSIF module_version == '0.003008' %]
+                        <div class="dialog message">
+                        Installed version of MARC::Transform is [% module_version %] but latest version is 0.003009, so you might encounter malfunctions (fixed in 0.003009)
+                        </div>
+                    [% ELSIF module_version == '0.003009' %]
                     [% ELSE %]
                         <div class="dialog message">
-                        Installed version of MARC::Transform is [% module_version %] but latest version is 0.003008, so you might encounter malfunctions
+                        Installed version of MARC::Transform is [% module_version %] but latest version is 0.003009, so you might encounter malfunctions
                         </div>
                     [% END %]
                 [% END %]

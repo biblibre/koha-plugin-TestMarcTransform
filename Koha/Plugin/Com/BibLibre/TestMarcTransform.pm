@@ -17,6 +17,7 @@ use open qw/ :std :utf8 /;
 use Koha::Biblios;
 my $module_unavailable = 0;
 eval "use MARC::Transform; 1" or $module_unavailable = 1;
+our $VERSION = "0.1.3";
 my $module_version;
 unless($module_unavailable){
     $module_version="$MARC::Transform::VERSION";
@@ -29,7 +30,7 @@ our $metadata = {
     date_updated    => '2019-12-03',
     minimum_version => '17.11.00.000',
     maximum_version => undef,
-    version         => "0.1.2",
+    version         => $VERSION,
     description     => "This plugin aims to test MARC::Transform's yaml's configuration on Koha MARC records (biblios or authorities)",
 };
 #mandatory
