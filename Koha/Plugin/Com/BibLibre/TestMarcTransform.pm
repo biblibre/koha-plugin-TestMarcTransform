@@ -89,7 +89,7 @@ sub run {
     }
     my @jobs;
     my $increc=0;
-    #launch transformation with yaml for each id defined
+    #launch transformation with yaml  for each id defined
     if(defnonull($cgi->param('recordids'))){
         foreach my $recordid(split(/[[:space:]]+/,$cgi->param('recordids'))){
             $increc++;
