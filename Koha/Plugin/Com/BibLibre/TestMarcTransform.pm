@@ -16,7 +16,7 @@ use utf8;
 use Koha::Biblios;
 my $module_unavailable = 0;
 eval "use MARC::Transform; 1" or $module_unavailable = 1;
-our $VERSION = "0.1.4";
+our $VERSION = "0.1.5";
 my $module_version;
 unless($module_unavailable){
     $module_version="$MARC::Transform::VERSION";
@@ -26,8 +26,8 @@ our $metadata = {
     name            => 'Test MARC::Transform',
     author          => 'Stéphane Delaune <stephane.delaune@biblibre.com>',
     date_authored   => '2019-11-22',
-    date_updated    => '2022-12-06',
-    minimum_version => '17.11.00.000',
+    date_updated    => '2023-01-11',
+    minimum_version => '20.11.00.000',
     maximum_version => undef,
     version         => $VERSION,
     description     => "This plugin aims to test MARC::Transform's yaml's configuration on Koha MARC records (biblios or authorities)",
