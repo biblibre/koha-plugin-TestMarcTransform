@@ -5,7 +5,6 @@ use base qw(Koha::Plugins::Base);
 use Modern::Perl;
 
 use C4::Context;
-use C4::Biblio qw( GetMarcBiblio );
 use C4::Items;
 use C4::AuthoritiesMarc qw( GetAuthority );
 use C4::Charset;
@@ -103,11 +102,10 @@ sub run {
                 my $record;
                 #if biblio
                 if($cgi->param('authorbib') eq "biblionumber"){
-                    eval { $record = GetMarcBiblio({ biblionumber => $recordid, embed_items  => 1 })};
-                    if ($@) {$@=~s/\n/<br \/>/g;$terror.= $recordid." is a bad biblionumber from GetMarcBiblio:". $@.". ";}
-                    elsif (!$record) {$terror.= $recordid." is a bad biblionumber from GetMarcBiblio.";}
+                    my $biblio = Koha::Biblios->find( $recordid );
+                    $record = $biblio->metadata->record({ embed_items => 1 }) if $biblio;
+                    unless ($record){$terror.= "No record from biblionumber ".$recordid.". ";}
                     else {
-                        my $biblio = Koha::Biblios->find( $recordid );
                         $title = "Biblio number ".$recordid." «".$biblio->title."»";
                     }
                 }#else if authority
