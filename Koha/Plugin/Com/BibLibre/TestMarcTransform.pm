@@ -13,24 +13,27 @@ use MARC::Field;
 use Data::Dumper;
 use utf8;
 use Koha::Biblios;
+
 my $module_unavailable = 0;
 eval "use MARC::Transform; 1" or $module_unavailable = 1;
-our $VERSION = "0.1.5";
 my $module_version;
 unless($module_unavailable){
     $module_version="$MARC::Transform::VERSION";
 }
 #$module_version='0.003008';
+
+our $VERSION = "0.1.6";
 our $metadata = {
     name            => 'Test MARC::Transform',
     author          => 'Stéphane Delaune <stephane.delaune@biblibre.com>',
     date_authored   => '2019-11-22',
-    date_updated    => '2023-01-11',
+    date_updated    => '2023-05-12',
     minimum_version => '20.11.00.000',
     maximum_version => undef,
     version         => $VERSION,
     description     => "This plugin aims to test MARC::Transform's yaml's configuration on Koha MARC records (biblios or authorities)",
 };
+
 #mandatory
 sub new {
     my ( $class, $args ) = @_;
@@ -39,6 +42,28 @@ sub new {
     my $self = $class->SUPER::new($args);
     return $self;
 }
+
+# Mandatory even if does nothing
+sub install {
+    my ( $self, $args ) = @_;
+
+    return 1;
+}
+
+# Mandatory even if does nothing
+sub upgrade {
+    my ( $self, $args ) = @_;
+
+    return 1;
+}
+
+# Mandatory even if does nothing
+sub uninstall {
+    my ( $self, $args ) = @_;
+
+    return 1;
+}
+
 #to appear in admin/tools
 sub tool {
     my ( $self, $args ) = @_;
